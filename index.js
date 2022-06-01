@@ -39,6 +39,10 @@ module.exports.getDevices=(type)=> {
 
 //Get the model type of a gamepad.
 module.exports.getType = (dev) => { return getTypeAndStyle(dev)[0]; }
+const getType = module.exports.getType;
+const open = module.exports.open;
+const getDevices = module.exports.getDevices;
+const getFeatures = module.exports.getFeatures;
 
 function getTypeAndStyle(dev) {
 	if(dev.type != null) return [dev.type,dev.style]; const gk=Object.keys(mapping);

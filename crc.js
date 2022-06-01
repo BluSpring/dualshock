@@ -360,8 +360,10 @@ var CrcUtil = function() {
 	}
 };
 
-module.exports.crc32 = (bytes) => {
+function crc32(bytes) {
 	var crc = new Crc(32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, true, true);
 	var crcValue = crc.compute(bytes);
 	return new Uint8Array((new Int32Array([crcValue])).buffer);
 }
+
+module.exports.crc32 = crc32;
