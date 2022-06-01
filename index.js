@@ -1,7 +1,12 @@
 //Node DualShock Library, ©2022 Pecacheu. GNU GPL v3.0
-import fs from 'fs'; import hid from 'node-hid'; import chalk from 'chalk';
-import {fileURLToPath} from 'url'; const RD_ERR="Error: could not read from HID device",
-MAPDIR=new URL('.',import.meta.url)+"mapping/", MAPPATH=fileURLToPath(MAPDIR);
+
+const fs = require('fs');
+const hid = require('node-hid');
+const chalk = require('chalk');
+const path = require('path');
+
+const RD_ERR = "Error: could not read from HID device",
+	MAPDIR = path.join(__dirname, "mapping/");
 
 //Extra Useful Functions:
 function error(text, dt) { throw chalk.red("Error: ")+chalk.dim(text)+(dt?"\n"+dt:""); }
@@ -9,15 +14,15 @@ function obMax(o) {let k=Object.keys(o),i=0,l=k.length,m=0,s;for(;i<l;i++)if(o[k
 function objAdd(a,b) {for(let k=Object.keys(b),i=0,l=k.length;i<l;i++)a[k[i]]=b[k[i]]}
 
 //Controller Mappings:
-const dir=fs.readdirSync(MAPPATH), mapping={}, api={};
+const dir=fs.readdirSync(MAPDIR), mapping={}, api={};
 for(let i=0,l=dir.length,f; i<l; i++) {
 	f=dir[i].split('.');
-	if(f[1] == 'json') mapping[f[0]] = JSON.parse(fs.readFileSync(MAPPATH+dir[i], 'utf8'));
-	else if(f[1] == 'js') api[f[0]] = await import(MAPDIR+dir[i]);
+	if(f[1] == 'json') mapping[f[0]] = JSON.parse(fs.readFileSync(path.join(MAPDIR, dir[i]), 'utf8'));
+	else if(f[1] == 'js') api[f[0]] = require(path.join(MAPDIR, dir[i]));
 }
 
 //Get a list of available gamepads.
-export function getDevices(type) {
+module.exports.getDevices=(type)=> {
 	const hidDev=hid.devices(), dev=[];
 	for(let i=0,l=hidDev.length,d,t,s; i<l; i++) {
 		d=hidDev[i]; t=getTypeAndStyle(d); s=t[1]; t=t[0];
@@ -33,7 +38,7 @@ export function getDevices(type) {
 }
 
 //Get the model type of a gamepad.
-export function getType(dev) { return getTypeAndStyle(dev)[0]; }
+module.exports.getType = (dev) => { return getTypeAndStyle(dev)[0]; }
 
 function getTypeAndStyle(dev) {
 	if(dev.type != null) return [dev.type,dev.style]; const gk=Object.keys(mapping);
@@ -57,13 +62,13 @@ function getMode(dev) {
 }
 
 //Get a list of special features the gamepad supports.
-export function getFeatures(dev) {
+module.exports.getFeatures=(dev)=> {
 	const type=getType(dev), m=mapping[type];
 	if(m) return m.special || []; return false;
 }
 
 //Open a gamepad device for communication.
-export function open(dev, opt) {
+module.exports.open=(dev, opt)=> {
 	if(typeof opt != "object") opt={};
 	let gType=getTypeAndStyle(dev), gStyle=gType[1], gmp; gType=gType[0];
 	if(!gType) error("HID device is not a supported controller!");

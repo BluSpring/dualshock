@@ -1,5 +1,6 @@
 //DualShock Library Demo, ©2022 Pecacheu. GNU GPL v3.0
-import chalk from 'chalk'; import * as ds from '../index.js';
+const chalk = require('chalk');
+const ds = require('../index');
 let nLedVal=0; begin();
 
 //Main Program:

@@ -1,38 +1,42 @@
 //Node DualShock Library, ©2022 Pecacheu. GNU GPL v3.0
-import {crc32 as crc} from '../crc.js'; import {Resampler} from '../resampler.js';
-import {createRequire} from 'module'; createRequire(import.meta.url)('../build/Release/sbc');
+const { crc32 } = require('../crc');
+const crc = crc32;
 
-export function _init() {
+const { Resampler } = require('../resampler');
+require('../build/Release/sbc');
+
+module.exports._init = () => {
 	this.rPowL=0, this.rPowR=0, this.ledState=[0,0,0,0,0], this.vol=[0,0,0,0];
 }
 
-export function _parse(data,chg) {
+module.exports._parse = (data,chg) => {
 	//Reset finger smoothing data on touchpad press:
 	if(chg.t1 && this.digital.t1) this.msData.t1X=[], this.msData.t1Y=[];
 	if(chg.t2 && this.digital.t2) this.msData.t2X=[], this.msData.t2Y=[];
 }
 
-export function _getMode(dev) {
+module.exports._getMode = (dev) => {
 	return dev.release==0?"bluetooth":"usb";
 }
 
-export function setLed(r, g, b, flashOn, flashOff) {
+module.exports.setLed = (r, g, b, flashOn, flashOff) => {
 	let s=this.ledState;
-	for(let i=0; i<5; i++) if(arguments[i] != null) s[i] = arguments[i]||0;
+	const args = [r,g,b,flashOn,flashOff];
+	for(let i=0; i<5; i++) if(args[i] != null) s[i] = args[i]||0;
 	ds4Write(this);
 }
 
-export function rumble(left, right) {
+module.exports.rumble = (left, right)=> {
 	this.rPowL=left||0, this.rPowR=right||0;
 	ds4Write(this);
 }
 
-export function rumbleAdd(left, right) {
+module.exports.rumbleAdd = (left, right)=> {
 	if(left>0) this.rPowL=left; if(right>0) this.rPowR=right;
 	ds4Write(this);
 }
 
-export function setVolume(left, right, mic, spk) {
+module.exports.setVolume=(left, right, mic, spk)=> {
 	this.vol=[left||0,right||0,mic||0,spk||0];
 	ds4Write(this);
 }
@@ -46,7 +50,7 @@ function initSound(ibl) {
 	resamp=new Resampler(44100, 32000, 2, sData);
 }
 
-export function sound(raw,ibl) {
+module.exports.sound=(raw,ibl)=> {
 	if(!sData) initSound(ibl); if(!raw || raw.length == 0) return;
 	if(raw.length > RESAMP_BUF) throw "Data too long for buffer! "+raw.length;
 
