@@ -92,7 +92,7 @@ struct a2dp_sbc {
 	uint8_t allocation_method:2;
 	uint8_t min_bitpool;
 	uint8_t max_bitpool;
-} __attribute__ ((packed));
+} __attribute__ (packed);
 
 #else
 #error "Unknown byte order"
